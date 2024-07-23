@@ -21,4 +21,15 @@ func main() {
 	for scanner.Scan() {
 		fmt.Printf("line: %s\n", scanner.Text())
 	}
+
+	fa := FileAnalyzer{
+		WordCount: 		10,
+		LineCount: 		1,
+		FrequentWord: 	[]string{"and"},
+		LongestWord: 	[]string{"example"},
+		ShortestWord: 	[]string{"and"},
+		Sentiment: 		positiveSentiment,
+	}
+
+	fmt.Printf("%+v\n", fa)
 }
