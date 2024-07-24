@@ -1,35 +1,65 @@
 package main
 
+import (
+	"bufio"
+	"os"
+	"strings"
+	"unicode"
+)
+
 type TextSentiment string
 
 var (
-	positiveSentiment 	TextSentiment = "positive"
-	neutralSentiment 	TextSentiment = "neutral"
-	negativeSentiment 	TextSentiment = "negative"
+	positiveSentiment TextSentiment = "positive"
+	neutralSentiment  TextSentiment = "neutral"
+	negativeSentiment TextSentiment = "negative"
 )
 
 type FileAnalyzer struct {
 	// WordCount represents the number of words that the file contains
-	WordCount 		int
+	WordCount int
 
 	// LineCount represents the number of line which the file contains
-	LineCount 		int
+	LineCount int
 
 	// CharacterCount represents the total number of characters in the file
-	CharacterCount 	int
+	CharacterCount int
 
 	// Sentiment analysis determines the overall sentiment of the text (positive, negative, neutral).
-	Sentiment		TextSentiment
+	Sentiment TextSentiment
 
 	// FrequentWord represents words which is frequently used in file
-	FrequentWord 	[]string
+	FrequentWord []string
 
 	// LongestWord represents the word which is the larger in the file
-	LongestWord 	[]string
+	LongestWord []string
 
 	// ShortestWord represents the word which is the shorter in the file
-	ShortestWord 	[]string
+	ShortestWord []string
 
 	// Language represents the language in which the file is written
-	Language 		string
+	Language string
+}
+
+func (fa *FileAnalyzer) ReadFile(filePath string) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		fa.LineCount++
+		fa.CharacterCount += len(line)
+
+		words := strings.FieldsFunc(line, func(c rune) bool {
+			return unicode.IsSpace(c) || unicode.IsPunct(c)
+		})
+
+		fa.WordCount += len(words)
+	}
+
+	return nil
 }
