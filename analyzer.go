@@ -29,7 +29,7 @@ type FileAnalyzer struct {
 	Sentiment TextSentiment
 
 	// FrequentWord represents words which is frequently used in file
-	FrequentWord []string
+	FrequentWord map[string]int
 
 	// LongestWord represents the word which is the larger in the file
 	LongestWord []string
@@ -41,7 +41,26 @@ type FileAnalyzer struct {
 	Language string
 }
 
+func NewFileAnalyzer() *FileAnalyzer {
+	return &FileAnalyzer{
+		FrequentWord: make(map[string]int),
+		LongestWord:  []string{},
+		ShortestWord: []string{},
+	}
+}
+
 func (fa *FileAnalyzer) ReadFile(filePath string) error {
+	if fa.FrequentWord == nil {
+		fa.FrequentWord = make(map[string]int)
+	}
+	// Initialize the slice if it's nil
+	if fa.LongestWord == nil {
+		fa.LongestWord = []string{}
+	}
+	if fa.ShortestWord == nil {
+		fa.ShortestWord = []string{}
+	}
+
 	file, err := os.Open(filePath)
 	if err != nil {
 		return err
@@ -57,6 +76,15 @@ func (fa *FileAnalyzer) ReadFile(filePath string) error {
 		words := strings.FieldsFunc(line, func(c rune) bool {
 			return unicode.IsSpace(c) || unicode.IsPunct(c)
 		})
+
+		for _, word := range words {
+			_, ok := fa.FrequentWord[word]
+			if ok {
+				fa.FrequentWord[word]++
+			} else {
+				fa.FrequentWord[word] = 1
+			}
+		}
 
 		fa.WordCount += len(words)
 	}

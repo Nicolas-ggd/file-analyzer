@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	fa := FileAnalyzer{}
+	fa := NewFileAnalyzer()
 	err := fa.ReadFile("text.txt")
 	if err != nil {
 		panic(err)
