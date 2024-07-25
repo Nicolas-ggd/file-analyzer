@@ -7,14 +7,6 @@ import (
 	"unicode"
 )
 
-type TextSentiment string
-
-var (
-	positiveSentiment TextSentiment = "positive"
-	neutralSentiment  TextSentiment = "neutral"
-	negativeSentiment TextSentiment = "negative"
-)
-
 type FileAnalyzer struct {
 	// WordCount represents the number of words that the file contains
 	WordCount int
@@ -25,17 +17,14 @@ type FileAnalyzer struct {
 	// CharacterCount represents the total number of characters in the file
 	CharacterCount int
 
-	// Sentiment analysis determines the overall sentiment of the text (positive, negative, neutral).
-	Sentiment TextSentiment
-
 	// FrequentWord represents words which is frequently used in file
 	FrequentWord map[string]int
 
 	// LongestWord represents the word which is the larger in the file
-	LongestWord []string
+	LongestWord string
 
 	// ShortestWord represents the word which is the shorter in the file
-	ShortestWord []string
+	ShortestWord string
 
 	// Language represents the language in which the file is written
 	Language string
@@ -44,21 +33,12 @@ type FileAnalyzer struct {
 func NewFileAnalyzer() *FileAnalyzer {
 	return &FileAnalyzer{
 		FrequentWord: make(map[string]int),
-		LongestWord:  []string{},
-		ShortestWord: []string{},
 	}
 }
 
 func (fa *FileAnalyzer) ReadFile(filePath string) error {
 	if fa.FrequentWord == nil {
 		fa.FrequentWord = make(map[string]int)
-	}
-	// Initialize the slice if it's nil
-	if fa.LongestWord == nil {
-		fa.LongestWord = []string{}
-	}
-	if fa.ShortestWord == nil {
-		fa.ShortestWord = []string{}
 	}
 
 	file, err := os.Open(filePath)
@@ -78,6 +58,7 @@ func (fa *FileAnalyzer) ReadFile(filePath string) error {
 		})
 
 		for _, word := range words {
+			fa.longestWord(word)
 			_, ok := fa.FrequentWord[word]
 			if ok {
 				fa.FrequentWord[word]++
@@ -90,4 +71,15 @@ func (fa *FileAnalyzer) ReadFile(filePath string) error {
 	}
 
 	return nil
+}
+
+func (fa *FileAnalyzer) longestWord(s string) (best string) {
+	for _, words := range strings.Split(s, ", ") {
+		if len(words) > len(best) {
+			best = words
+			fa.LongestWord = best
+		}
+	}
+
+	return
 }
